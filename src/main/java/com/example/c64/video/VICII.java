@@ -1,6 +1,6 @@
 package com.example.c64.video;
 
-//import com.example.c64.bus.Bus;
+import com.example.c64.bus.Bus;
 import com.example.c64.memory.Memory;
 
 import java.awt.*;
@@ -8,12 +8,11 @@ import java.awt.*;
 public class VICII {
 
     private Memory memory;
-    //private Bus bus;
+    private Bus bus;
     private C64Screen screen;
 
-    public VICII(Memory memory) {
-        //this.bus = bus;
-        this.memory = memory;
+    public VICII(Bus bus) {
+        this.bus = bus;
         this.screen = new C64Screen();
     }
 
@@ -37,7 +36,7 @@ public class VICII {
                     screenBase + row * 40 + col;
 
                 int code =
-                    memory.read(addr) & 0xFF;
+                    bus.read(addr) & 0xFF;
 
                 char c;
 

@@ -2,7 +2,7 @@ package com.example.c64;
 
 import com.example.c64.cpu.CPU6510;
 import com.example.c64.io.KernalHooks;
-import com.example.c64.memory.Memory;
+import com.example.c64.bus.Bus;
 import com.example.c64.util.RomLoader;
 import com.example.c64.video.VICII;
 
@@ -11,48 +11,55 @@ public class Main {
     public static void main(String[] args)
         throws Exception {
 
-        Memory mem = new Memory();
+        //Memory mem = new Memory();
+        Bus bus = new Bus();
 
-        mem.loadBasic(
-            RomLoader.load("roms/basic_generic.rom")
-        );
+    C64 c64 = new C64();
 
-        mem.loadKernal(
-            RomLoader.load("roms/kernal_generic.rom")
-        );
+    c64.initialize();
 
-        KernalHooks hooks =
-            new KernalHooks();
+    c64.run();
 
-        CPU6510 cpu =
-            new CPU6510(mem);
+        //bus.getBasicRom().load("roms/basic_generic.rom");
 
-        VICII vic =
-            new VICII(mem);
+        // mem.loadBasic(
+        //     RomLoader.load("basic.rom")
+        // );
 
-        cpu.reset();
+        //bus.getKernalRom().load("roms/kernal_generic.rom");
+
+        // KernalHooks hooks =
+        //     new KernalHooks();
+
+        // CPU6510 cpu =
+        //     new CPU6510(bus, hooks);
+
+        // VICII vic =
+        //     new VICII(bus);
+
+        //cpu.reset();
 
         while (true) {
 
-mem.write(0x0400, (byte)'H');
-mem.write(0x0401, (byte)'E');
-mem.write(0x0402, (byte)'L');
-mem.write(0x0403, (byte)'L');
-mem.write(0x0404, (byte)'O');
-vic.renderFrame();
+bus.getRam().write(0x0400, (byte)'H');
+bus.getRam().write(0x0401, (byte)'E');
+bus.getRam().write(0x0402, (byte)'L');
+bus.getRam().write(0x0403, (byte)'L');
+bus.getRam().write(0x0404, (byte)'O');
+// vic.renderFrame();
 
-            // Ejecutar CPU
-            for (int i = 0; i < 1000; i++) {
-                cpu.step();
-            }
+//             // Ejecutar CPU
+//             for (int i = 0; i < 1000; i++) {
+//                 cpu.step();
+//             }
 
-            // Render
-            vic.renderFrame();
+//             // Render
+//             vic.renderFrame();
 
-            Thread.sleep(16);
-        }
-    }
-}
+//             Thread.sleep(16);
+         }
+     }
+ }
 
 
 
