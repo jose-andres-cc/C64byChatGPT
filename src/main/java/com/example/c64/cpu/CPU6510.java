@@ -18,13 +18,44 @@ public class CPU6510 {
         return (hi<<8)|lo;
     }
 
-    public void reset(int start){ PC=start; }
+    //public void reset(int start){ PC=start; }
+public void reset() {
+
+    SP = 0xFD;
+
+    setStatusRegister(0x24);
+
+    PC = readVector(0xFFFC);
+
+//cpuPortDataDirection = 0x2F;
+//cpuPortData = 0x37;
+
+}
 
     private void setZN(int v){
         Z=(v&0xFF)==0;
         N=(v&0x80)!=0;
     }
 
+    private void setStatusRegister(int p) {
+        p |= 0x20;
+
+        C = (p & 0x01) != 0;
+        Z = (p & 0x02) != 0;
+        I = (p & 0x04) != 0;
+        D = (p & 0x08) != 0;
+        B = (p & 0x10) != 0;
+        V = (p & 0x40) != 0;
+        N = (p & 0x80) != 0;
+    }    
+    
+    private int readVector(int address) {
+
+    int lo = read(address);
+    int hi = read(address + 1);
+
+    return (hi << 8) | lo;
+}
     private int imm(){ return read(PC++); }
     private int zp(){ return read(PC++); }
     private int zpx(){ return (read(PC++)+X)&0xFF; }

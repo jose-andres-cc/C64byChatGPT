@@ -1,23 +1,107 @@
-
 package com.example.c64;
 
 import com.example.c64.cpu.CPU6510;
+import com.example.c64.io.KernalHooks;
 import com.example.c64.memory.Memory;
+import com.example.c64.util.RomLoader;
+import com.example.c64.video.VICII;
 
 public class Main {
-    public static void main(String[] args) {
+
+    public static void main(String[] args)
+        throws Exception {
+
         Memory mem = new Memory();
-        CPU6510 cpu = new CPU6510(mem);
 
-        mem.write(0x8000,(byte)0xA2);
-        mem.write(0x8001,(byte)0x10);
-        mem.write(0x8002,(byte)0xE8);
-        mem.write(0x8003,(byte)0xEA);
+        mem.loadBasic(
+            RomLoader.load("roms/basic_generic.rom")
+        );
 
-        cpu.reset(0x8000);
+        mem.loadKernal(
+            RomLoader.load("roms/kernal_generic.rom")
+        );
 
-        for(int i=0;i<3;i++) cpu.step();
+        KernalHooks hooks =
+            new KernalHooks();
 
-        System.out.println("X=" + cpu.X);
+        CPU6510 cpu =
+            new CPU6510(mem);
+
+        VICII vic =
+            new VICII(mem);
+
+        cpu.reset();
+
+        while (true) {
+
+mem.write(0x0400, (byte)'H');
+mem.write(0x0401, (byte)'E');
+mem.write(0x0402, (byte)'L');
+mem.write(0x0403, (byte)'L');
+mem.write(0x0404, (byte)'O');
+vic.renderFrame();
+
+            // Ejecutar CPU
+            for (int i = 0; i < 1000; i++) {
+                cpu.step();
+            }
+
+            // Render
+            vic.renderFrame();
+
+            Thread.sleep(16);
+        }
     }
 }
+
+
+
+
+
+
+// public class Main {
+
+//     public static void main(String[] args) throws Exception {
+
+//         Memory mem = new Memory();
+
+//         mem.loadBasic(RomLoader.load("basic.rom"));
+//         mem.loadKernal(RomLoader.load("kernal.rom"));
+
+//         KernalHooks hooks = new KernalHooks();
+//         CPU6510 cpu = new CPU6510(mem, hooks);
+
+//         cpu.reset();
+
+//         while (true) {
+//             cpu.step();
+//         }
+//     }
+// }
+
+
+
+// package com.example.c64;
+
+// import com.example.c64.cpu.CPU6510;
+// import com.example.c64.memory.Memory;
+
+// public class Main {
+//     public static void main(String[] args) {
+//         Memory mem = new Memory();
+//         CPU6510 cpu = new CPU6510(mem);
+
+//         mem.write(0x8000,(byte)0xA2);
+//         mem.write(0x8001,(byte)0x10);
+//         mem.write(0x8002,(byte)0xE8);
+//         mem.write(0x8003,(byte)0xEA);
+
+//         cpu.reset(0x8000);
+
+//         for(int i=0;i<3;i++) cpu.step();
+
+//         System.out.println("X=" + cpu.X);
+//     }
+// }
+
+
