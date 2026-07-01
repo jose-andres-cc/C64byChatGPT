@@ -7,6 +7,7 @@ import com.example.c64.bus.Bus;
 import com.example.c64.cpu.CPU6510;
 import com.example.c64.io.KernalHooks;
 import com.example.c64.video.VICII;
+import com.example.c64.cia.CIA1;
 
 // Proyecto maven
 // src/main/java/
@@ -77,7 +78,7 @@ public class C64 {
 
     private final VICII vic;
 
-    // private final CIA1 cia1;
+    private final CIA1 cia1;
 
     // private final CIA2 cia2;
 
@@ -96,7 +97,7 @@ private volatile boolean running;
          vic = new VICII(bus);
         
 
-        // cia1 = new CIA1(bus);
+        cia1 = new CIA1(bus);
 
         // cia2 = new CIA2(bus);
 
@@ -108,7 +109,7 @@ private volatile boolean running;
 
          //bus.connectCPU(cpu);
          bus.connectVIC(vic);
-        // bus.connectCIA1(cia1);
+         bus.connectCIA1(cia1);
         // bus.connectCIA2(cia2);
     }
 
@@ -132,18 +133,71 @@ private volatile boolean running;
     }
 
 
-public void run() {
+    public void run() {
 
-    running = true;
+        running = true;
 
-    cpu.reset();
+        cpu.reset();
 
-    while (running) {
+        while (running) {
 
-        clock();
+            clock();
+        }
     }
-}    
 
+
+// public void run() {
+
+//     running = true;
+
+//     cpu.reset();
+
+//     long frameStart;
+
+//     while (running) {
+
+//         frameStart = System.nanoTime();
+
+//         while (!vic.isFrameComplete()) {
+
+//             clock();
+//         }
+
+//         vic.clearFrameFlag();
+
+//         screen.repaint();
+
+//         syncFrame(frameStart);
+//     }
+// }
+
+
+private void syncFrame(long frameStart) {
+
+    long frameTime =
+        20_000_000L;
+
+    long elapsed =
+        System.nanoTime() - frameStart;
+
+    long remaining =
+        frameTime - elapsed;
+
+    if (remaining > 0) {
+
+        try {
+
+            Thread.sleep(
+                remaining / 1_000_000L,
+                (int)(remaining % 1_000_000L)
+            );
+
+        } catch (InterruptedException e) {
+
+            Thread.currentThread().interrupt();
+        }
+    }
+}
 
 
 public void stop() {
@@ -157,37 +211,29 @@ public void stop() {
 
         public void clock() {
 
-        vic.clock();
-        vic.clock();
-        vic.clock();
+long before = cpu.getTotalCycles();
 
-        cpu.clock();
+cpu.clock();
 
-        // cia1.clock();
-        // cia2.clock();
+     long consumed =
+         cpu.getTotalCycles() - before;
+
+     for (long i = 0; i < consumed * 8; i++) {
+
+         vic.clock();
+         // Temporal
+         vic.renderFrame();
+     }
+
+     for (long i = 0; i < consumed; i++) {
+
+         cia1.clock();
+//         cia2.clock();
+     }
+
+
     }
 
-    // futuro
-// public void clock() {
-
-//     long before = cpu.getTotalCycles();
-
-//     cpu.clock();
-
-//     long consumed =
-//         cpu.getTotalCycles() - before;
-
-//     for (long i = 0; i < consumed * 8; i++) {
-
-//         vic.clock();
-//     }
-
-//     for (long i = 0; i < consumed; i++) {
-
-//         cia1.clock();
-//         cia2.clock();
-//     }
-// }
 
 
 }

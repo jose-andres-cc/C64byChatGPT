@@ -52,16 +52,21 @@ private void write(int address, int value) {
  
 public void reset() {
 
+    A = 0;
+    X = 0;
+    Y = 0;
     SP = 0xFD;
 
     setStatusRegister(0x24);
 
-    PC = readVector(0xFFFC);
+    PC = readWord(0xFFFC);
 
 //cpuPortDataDirection = 0x2F;
 //cpuPortData = 0x37;
-
+    cycles = 7;
 }
+
+
 
     private void setZN(int v){
         Z=(v&0xFF)==0;
@@ -1636,6 +1641,11 @@ private int readVector(int address) {
     return (hi << 8) | lo;
 }
 
+public void irq() {
+
+    irqPending = true;
+}
+
 private void handleIRQ() {
 
     pushWord(PC);
@@ -1651,6 +1661,13 @@ private void handleIRQ() {
     PC = readVector(0xFFFE);
 
     irqPending = false;
+
+    cycles = 7;
+}
+
+public void nmi() {
+
+    nmiPending = true;
 }
 
 private void handleNMI() {
@@ -1686,6 +1703,17 @@ public void clock() {
 
     if (cycles == 0) {
 
+        if (nmiPending) {
+
+            //serviceNMI();
+            handleNMI();
+
+        } else if (irqPending && !I) {
+
+            //serviceIRQ();
+            handleIRQ();
+        }
+
         int opcode = read(PC++) & 0xFF;
 
         Opcode instruction = opcodeTable[opcode];
@@ -1711,6 +1739,15 @@ public void clock() {
 }
 
 public long getCycles() {
+    return cycles;
+}
+
+public long getTotalCycles() {
+    return totalCycles;
+}
+
+//public int getRemainingCycles() {
+public long getRemainingCycles() {
     return cycles;
 }
 

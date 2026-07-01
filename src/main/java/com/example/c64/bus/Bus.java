@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.example.c64.cpu.CPU6510;
 import com.example.c64.memory.BasicROM;
 import com.example.c64.memory.CharacterROM;
 import com.example.c64.memory.KernalROM;
 import com.example.c64.memory.RAM;
 import com.example.c64.video.VICII;
+import com.example.c64.cia.CIA1;
 
 public class Bus {
 
@@ -35,9 +37,11 @@ public class Bus {
 
     private VICII vic;
 
-    // private CIA1 cia1;
+    private CIA1 cia1;
 
     // private CIA2 cia2;
+
+private CPU6510 cpu;
 
     public Bus() {
 
@@ -54,13 +58,23 @@ public class Bus {
         this.vic = vic;
     }
 
-    // public void connectCIA1(CIA1 cia1) {
-    //     this.cia1 = cia1;
-    // }
+     public void connectCIA1(CIA1 cia1) {
+         this.cia1 = cia1;
+     }
 
     // public void connectCIA2(CIA2 cia2) {
     //     this.cia2 = cia2;
     // }
+
+public void connectCPU(CPU6510 cpu) {
+
+    this.cpu = cpu;
+}
+
+public void requestIRQ() {
+
+    cpu.irq();
+}
 
     public int read(int address) {
 
@@ -179,19 +193,19 @@ public class Bus {
 
     private int readIO(int address) {
 
-        // if (vic != null &&
-        //     address >= 0xD000 &&
-        //     address <= 0xD3FF) {
+         if (vic != null &&
+             address >= 0xD000 &&
+             address <= 0xD3FF) {
 
-        //     return vic.read(address);
-        // }
+             return vic.read(address);
+         }
 
-        // if (cia1 != null &&
-        //     address >= 0xDC00 &&
-        //     address <= 0xDCFF) {
+         if (cia1 != null &&
+             address >= 0xDC00 &&
+             address <= 0xDCFF) {
 
-        //     return cia1.read(address);
-        // }
+             return cia1.read(address);
+         }
 
         // if (cia2 != null &&
         //     address >= 0xDD00 &&
@@ -205,21 +219,21 @@ public class Bus {
 
     private void writeIO(int address, int value) {
 
-        // if (vic != null &&
-        //     address >= 0xD000 &&
-        //     address <= 0xD3FF) {
+        if (vic != null &&
+            address >= 0xD000 &&
+            address <= 0xD3FF) {
 
-        //     vic.write(address, value);
-        //     return;
-        // }
+            vic.write(address, value);
+            return;
+        }
 
-        // if (cia1 != null &&
-        //     address >= 0xDC00 &&
-        //     address <= 0xDCFF) {
+        if (cia1 != null &&
+            address >= 0xDC00 &&
+            address <= 0xDCFF) {
 
-        //     cia1.write(address, value);
-        //     return;
-        // }
+            cia1.write(address, value);
+            return;
+        }
 
         // if (cia2 != null &&
         //     address >= 0xDD00 &&

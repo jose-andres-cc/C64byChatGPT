@@ -18,6 +18,13 @@ public class Main {
 
     c64.initialize();
 
+bus.getRam().write(0x0400, (byte)'H');
+bus.getRam().write(0x0401, (byte)'E');
+bus.getRam().write(0x0402, (byte)'L');
+bus.getRam().write(0x0403, (byte)'L');
+bus.getRam().write(0x0404, (byte)'O');
+
+
     c64.run();
 
         //bus.getBasicRom().load("roms/basic_generic.rom");
