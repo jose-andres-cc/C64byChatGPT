@@ -11,6 +11,7 @@ import com.example.c64.memory.KernalROM;
 import com.example.c64.memory.RAM;
 import com.example.c64.video.VICII;
 import com.example.c64.cia.CIA1;
+import com.example.c64.cia.CIA2;
 
 public class Bus {
 
@@ -39,7 +40,9 @@ public class Bus {
 
     private CIA1 cia1;
 
-    // private CIA2 cia2;
+    private CIA2 cia2;
+
+private int vicBank = 3;    
 
 private CPU6510 cpu;
 
@@ -62,9 +65,9 @@ private CPU6510 cpu;
          this.cia1 = cia1;
      }
 
-    // public void connectCIA2(CIA2 cia2) {
-    //     this.cia2 = cia2;
-    // }
+     public void connectCIA2(CIA2 cia2) {
+         this.cia2 = cia2;
+     }
 
 public void connectCPU(CPU6510 cpu) {
 
@@ -74,6 +77,11 @@ public void connectCPU(CPU6510 cpu) {
 public void requestIRQ() {
 
     cpu.irq();
+}
+
+public void requestNMI() {
+
+    cpu.nmi();
 }
 
     public int read(int address) {
@@ -207,12 +215,12 @@ public void requestIRQ() {
              return cia1.read(address);
          }
 
-        // if (cia2 != null &&
-        //     address >= 0xDD00 &&
-        //     address <= 0xDDFF) {
+        if (cia2 != null &&
+            address >= 0xDD00 &&
+            address <= 0xDDFF) {
 
-        //     return cia2.read(address);
-        // }
+            return cia2.read(address);
+        }
 
         return 0xFF;
     }
@@ -235,12 +243,12 @@ public void requestIRQ() {
             return;
         }
 
-        // if (cia2 != null &&
-        //     address >= 0xDD00 &&
-        //     address <= 0xDDFF) {
+        if (cia2 != null &&
+            address >= 0xDD00 &&
+            address <= 0xDDFF) {
 
-        //     cia2.write(address, value);
-        // }
+            cia2.write(address, value);
+        }
     }
 
     public RAM getRam() {
@@ -298,6 +306,27 @@ public void loadRoms(
 
     charRom.load(chars);
 }
+
+public void setVicBank(int bank) {
+
+    vicBank = bank & 0x03;
+}
+
+public int getVicBank() {
+
+    return vicBank;
+}
+
+
+public int readVic(int address) {
+
+    address &= 0x3FFF;
+
+    int physicalAddress = (vicBank << 14) | address;
+
+    return ram.read(physicalAddress);
+}
+
 
 
 }

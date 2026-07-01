@@ -8,6 +8,7 @@ import com.example.c64.cpu.CPU6510;
 import com.example.c64.io.KernalHooks;
 import com.example.c64.video.VICII;
 import com.example.c64.cia.CIA1;
+import com.example.c64.cia.CIA2;
 
 // Proyecto maven
 // src/main/java/
@@ -80,7 +81,7 @@ public class C64 {
 
     private final CIA1 cia1;
 
-    // private final CIA2 cia2;
+     private final CIA2 cia2;
 
 private volatile boolean running;
 
@@ -99,7 +100,7 @@ private volatile boolean running;
 
         cia1 = new CIA1(bus);
 
-        // cia2 = new CIA2(bus);
+         cia2 = new CIA2(bus);
 
         KernalHooks hooks =
             new KernalHooks();
@@ -107,10 +108,10 @@ private volatile boolean running;
          cpu = new CPU6510(bus, hooks);
          cpu.reset(); // Viene de main
 
-         //bus.connectCPU(cpu);
+         bus.connectCPU(cpu);
          bus.connectVIC(vic);
          bus.connectCIA1(cia1);
-        // bus.connectCIA2(cia2);
+         bus.connectCIA2(cia2);
     }
 
     public void initialize() {
@@ -228,7 +229,7 @@ cpu.clock();
      for (long i = 0; i < consumed; i++) {
 
          cia1.clock();
-//         cia2.clock();
+         cia2.clock();
      }
 
 

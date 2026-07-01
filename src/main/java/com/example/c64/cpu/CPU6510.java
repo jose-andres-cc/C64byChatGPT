@@ -1687,16 +1687,9 @@ private void handleNMI() {
     nmiPending = false;
 }
 
-private void tick(int count) {
+private void tick(int extraCycles) {
 
-    cycles += count;
-
-    // for(int i = 0; i < count; i++) {
-
-    //     vic.clock();
-    //     cia1.clock();
-    //     cia2.clock();
-    // }
+    cycles += extraCycles;
 }
 
 public void clock() {
